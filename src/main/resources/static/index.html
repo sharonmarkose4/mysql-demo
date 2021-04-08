@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script type="text/javascript">
+	function sendData() {
+		fetch('/user', {
+			method : 'POST',
+			headers : {
+				'Content-Type' : 'application/json'
+			},
+			body : JSON.stringify({
+				name : document.getElementById('username').value,
+				email : document.getElementById('email').value,
+				mobileNumber : document.getElementById('mobileNumber').value
+			})
+		});
+	}
+	function getData() {
+		let users = fetch('/user', {
+			method : 'GET',
+			headers : {
+				'Content-Type' : 'application/json'
+			}
+		});
+	}
+	function getDataById() {
+		let id = document.getElementById('id').value;
+		let user = fetch('/user/' + id, {
+			method : 'GET',
+			headers : {
+				'Content-Type' : 'application/json'
+			}
+		}).then( response=>response.json())
+		.then(user => console.log(user));
+	//userData=user.name;
+	//console.log(userData);
+	 document.getElementById('users').innerHTML=user;
+	}
+	function updateData() {
+		let id = document.getElementById('id').value;
+		fetch('/user/' + id, {
+			method : 'PUT',
+			headers : {
+				'Content-Type' : 'application/json'
+			},
+			body : JSON.stringify({
+				name : document.getElementById('username').value,
+				email : document.getElementById('email').value,
+				mobileNumber : document.getElementById('mobileNumber').value
+			})
+		});
+	}
+	function deleteData() {
+		let id = document.getElementById('id').value;
+		fetch('/user/' + id, {
+			method : 'DELETE',
+			headers : {
+				'Content-Type' : 'application/json'
+			}
+
+		});
+
+	}
+</script>
+</head>
+<body>
+	<input id="username" placeholder="Name">
+	<br>
+	<input id="email" placeholder="Email">
+	<br>
+	<input id="mobileNumber" placeholder="Mobile Number">
+	<br>
+	<button onclick="sendData()">Save</button>
+	<br>
+	<button onclick="getData()">Get Users</button>
+	<br>
+	<p id="users"></p>
+	<input id="id" placeholder="User Id">
+	<button onclick="getDataById()">Get User By Id</button>
+	<button onclick="updateData()">Update User</button>
+	<button onclick="deleteData()">Delete User</button>
+</body>
+</html>
