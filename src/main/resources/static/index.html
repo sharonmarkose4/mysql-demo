@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head> 
 <meta charset="ISO-8859-1">
 <title>Insert title here</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script type="text/javascript">
-	function sendData() {
-		fetch('/user', {
+	function saveUser() {
+		function success(response){
+			console.log(response);
+			return response.json();
+		}
+		function errorHandler(error){
+			console.log(error);
+		}
+		
+		console.log('2');
+		const userform=document.getElementById('userform');
+		if(!userform.checkValidity()){
+			alert('form is invalid');
+			return;
+		}
+		
+		
+		const promise=fetch('/user', {
 			method : 'POST',
 			headers : {
 				'Content-Type' : 'application/json'
@@ -13,30 +33,54 @@
 			body : JSON.stringify({
 				name : document.getElementById('username').value,
 				email : document.getElementById('email').value,
-				mobileNumber : document.getElementById('mobileNumber').value
+				mobileNumber : document.getElementById('mobileNumber').value,
+				dob : document.getElementById('dobid').value
 			})
 		});
-	}
-	function getData() {
-		let users = fetch('/user', {
-			method : 'GET',
-			headers : {
-				'Content-Type' : 'application/json'
-			}
+		promise.then(success);
+		promise.then(function(data){
+			console.log(data);
 		});
+		promise.catch(function (error){
+			console.log(error);
+		});
+		console.log('1');
 	}
-	function getDataById() {
-		let id = document.getElementById('id').value;
-		let user = fetch('/user/' + id, {
-			method : 'GET',
-			headers : {
-				'Content-Type' : 'application/json'
+	function getUsers() {
+		const promise = fetch('/user');
+		promise.then(function(response){
+			return response.json();
+		})
+		.then(function(users){
+			console.log(users);
+			const table=document.getElementById('users');
+			for(let index=0;index<users.length;index++){
+				console.log(users[index]);
+				const currentUser=users[index];
+				const row=document.createElement('tr');
+				const nameColumn=document.createElement('td');
+				const emailColumn=document.createElement('td');
+				const numberColumn=document.createElement('td');
+				nameColumn.append(currentUser.name);
+				emailColumn.append(currentUser.email);
+				numberColumn.append(currentUser.mobileNumber);
+				row.appendChild(nameColumn);
+				row.appendChild(emailColumn);
+				row.appendChild(numberColumn);
+				table.appendChild(row);
+			
 			}
-		}).then( response=>response.json())
-		.then(user => console.log(user));
-	//userData=user.name;
-	//console.log(userData);
-	 document.getElementById('users').innerHTML=user;
+		})	
+	}
+	function getUser() {
+		let id = document.getElementById('id').value;
+		const promise = fetch('/user/' + id)
+		promise.then(function(response){
+			return response.json();
+		})
+		.then(function(users){
+			console.log(users);	
+		})
 	}
 	function updateData() {
 		let id = document.getElementById('id').value;
@@ -65,21 +109,31 @@
 	}
 </script>
 </head>
-<body>
-	<input id="username" placeholder="Name">
+<body class="jumbotron">
+	<h1>User Form</h1>
+	<form id="userform">
+
+		<input class="form-control" id="username" placeholder="Name"  value="Sharon"> <br>
+		 <input class="form-control"  id="email" placeholder="Email" value="sharon@gmail.com"> <br> 
+		 <input  class="form-control" type="tel" id="mobileNumber" value="9876543219" placeholder="Mobile Number"pattern="[0-9]{10}" required> <br>
+		 <input class="form-control" type='date' required id="dobid" placeholder="Date of Birth"> <br>
+	</form>
+	<button  class="btn btn-outline-primary" onclick="saveUser()">Save</button>
 	<br>
-	<input id="email" placeholder="Email">
+	<button  class="btn btn-outline-primary" onclick="getUsers()">Get Users</button>
 	<br>
-	<input id="mobileNumber" placeholder="Mobile Number">
-	<br>
-	<button onclick="sendData()">Save</button>
-	<br>
-	<button onclick="getData()">Get Users</button>
-	<br>
-	<p id="users"></p>
+	<table class=" table table.bordered">
+		<thead>
+			<th>Name</th>
+			<th>Email</th>
+			<th>Mobile Number</th>
+		</thead>
+		<tbody id="users">
+		</tbody>
+	</table>
 	<input id="id" placeholder="User Id">
-	<button onclick="getDataById()">Get User By Id</button>
-	<button onclick="updateData()">Update User</button>
-	<button onclick="deleteData()">Delete User</button>
+	<button  class="btn btn-outline-primary" onclick="getUser()">Get User By Id</button>
+	<button  class="btn btn-outline-primary" onclick="updateData()">Update User</button>
+	<button class="btn btn-outline-primary" onclick="deleteData()">Delete User</button>
 </body>
 </html>
